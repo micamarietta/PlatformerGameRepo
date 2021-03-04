@@ -59,6 +59,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if(other.gameObject.CompareTag("Coins"))
+        {
+            Destroy(other.gameObject);
+        }
+    }
+
+
     public void onLanding()
     {
         animator.SetBool("IsJumping", false);
