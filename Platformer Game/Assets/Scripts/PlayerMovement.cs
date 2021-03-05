@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -8,13 +9,17 @@ public class PlayerMovement : MonoBehaviour
 
     public Animator animator;
 
-    private bool fallingState = false;
+    public GameObject player;
 
     public float runSpeed = 25f;
     public bool hasJumpPotion = false;
     public bool hasSpeedPotion = false;
     public bool hasInvulPotion = false;
     public int potionModAmount = 0;
+
+    public AudioClip JumpClip;
+    public AudioClip CoinClip;
+    public AudioClip EnemyKillClip;
 
     float horizontalMove = 0f;
     bool jumpFlag = false;
@@ -41,20 +46,42 @@ public class PlayerMovement : MonoBehaviour
         //checking "jump keys" (spacebar) to see if it was pressed down
         if (Input.GetButtonDown("Jump"))
         {
-            jump = true;
-            animator.SetBool("IsJumping", true);
-            fallingState = false;
+            if(animator.GetBool("isJumping") == false)
+            {
+                AudioSource.PlayClipAtPoint(JumpClip, transform.position);
+                jump = true;
+                animator.SetBool("IsJumping", true);
+            }
+           
         }
 
+        //game over when player fall out of world
+        if(player.gameObject.transform.position.y <= -8)
+        {
+            EditorSceneManager.LoadScene("gameOver");
+        }
+
+        //game win when player gets to vending machine
+        if(player.gameObject.transform.position.x >= 37 && player.gameObject.transform.position.y >= 31)
+        {
+            EditorSceneManager.LoadScene("winScreen");
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (hasInvulPotion)
+        
+        if (other.gameObject.tag == "Enemy" && animator.GetBool("IsJumping"))
         {
-            if (other.gameObject.tag == "Enemy")
+            AudioSource.PlayClipAtPoint(EnemyKillClip, transform.position);
+            Destroy(other.gameObject);
+        }
+        else
+        {
+            if(other.gameObject.tag == "Enemy")
             {
-                Destroy(other.gameObject);
+                Destroy(player.gameObject);
+                EditorSceneManager.LoadScene("gameOver");
             }
         }
     }
@@ -63,7 +90,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if(other.gameObject.CompareTag("Coins"))
         {
+            AudioSource.PlayClipAtPoint(CoinClip, transform.position);
             Destroy(other.gameObject);
+
+        }else if (other.gameObject.CompareTag("invulStopper"))
+        {
+            //hasInvulPotion = false;
         }
     }
 
@@ -72,7 +104,6 @@ public class PlayerMovement : MonoBehaviour
     {
         animator.SetBool("IsJumping", false);
         jump = false;
-        fallingState = true;
     }
 
 
@@ -88,6 +119,11 @@ public class PlayerMovement : MonoBehaviour
             potionTimeCur = 0f;
             controller.m_JumpForceMod = 0;
             hasJumpPotion = false;
+        }
+
+        if (hasSpeedPotion)
+        {
+            runSpeed = 50f;
         }
 
         controller.Move(horizontalMove * Time.fixedDeltaTime, false, jump);

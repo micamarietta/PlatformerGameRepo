@@ -46,7 +46,7 @@ public class PotionController : MonoBehaviour
             }
             else if(potionType == PotionType.Invulnerability)
             {
-                collision.gameObject.GetComponent<PlayerMovement>().hasInvulPotion = true;
+                //collision.gameObject.GetComponent<PlayerMovement>().hasInvulPotion = true;
             }
 
             collision.gameObject.GetComponent<PlayerMovement>().potionModAmount = potionModAmount;
@@ -54,4 +54,6 @@ public class PotionController : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
+
+   
 }
