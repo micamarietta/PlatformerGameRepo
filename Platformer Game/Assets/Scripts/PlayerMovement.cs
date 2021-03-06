@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -27,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
 
     private float potionTimeMax = 10f;
     private float potionTimeCur = 0f;
+
 
     // Update is called once per frame
     void Update()
@@ -58,13 +59,15 @@ public class PlayerMovement : MonoBehaviour
         //game over when player fall out of world
         if(player.gameObject.transform.position.y <= -8)
         {
-            EditorSceneManager.LoadScene("gameOver");
+            //SceneManager.LoadScene(SceneManager.GetActiveScene()"gameOver");
+            Application.LoadLevel("gameOver");
         }
 
         //game win when player gets to vending machine
         if(player.gameObject.transform.position.x >= 37 && player.gameObject.transform.position.y >= 31)
         {
-            EditorSceneManager.LoadScene("winScreen");
+            //SceneManager.LoadScene("winScreen");
+            Application.LoadLevel("winScreen");
         }
     }
 
@@ -81,19 +84,19 @@ public class PlayerMovement : MonoBehaviour
             if(other.gameObject.tag == "Enemy")
             {
                 Destroy(player.gameObject);
-                EditorSceneManager.LoadScene("gameOver");
+                //SceneManager.LoadScene("gameOver");
+                Application.LoadLevel("gameOver");
             }
         }
     }
-
-    private void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerEnter2D(Collider2D other)
     {
         if(other.gameObject.CompareTag("Coins"))
         {
             AudioSource.PlayClipAtPoint(CoinClip, transform.position);
             Destroy(other.gameObject);
 
-        }else if (other.gameObject.CompareTag("invulStopper"))
+        }//else if (other.gameObject.CompareTag("invulStopper"))
         {
             //hasInvulPotion = false;
         }
@@ -125,8 +128,7 @@ public class PlayerMovement : MonoBehaviour
         {
             runSpeed = 50f;
         }
-
-        controller.Move(horizontalMove * Time.fixedDeltaTime, false, jump);
+            controller.Move(horizontalMove * Time.fixedDeltaTime, false, jump);
 
         //we are currently jumping, make sure we only jump once
         if (jump)
@@ -135,5 +137,4 @@ public class PlayerMovement : MonoBehaviour
         }
 
     }
-
 }
